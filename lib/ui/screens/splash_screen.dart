@@ -13,18 +13,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Task Manager"),
-        backgroundColor: Colors.amber,
-      ),
-      body: Center(
-        child: SvgPicture.asset(
-          width: double.maxFinite,
-          height: double.maxFinite,
-          AssetsPath.backgroundSvg,
-          fit: BoxFit.cover,
-        ),
+      body: Stack(
+        children: [
+          SvgPicture.asset(
+            width: double.maxFinite,
+            height: double.maxFinite,
+            AssetsPath.backgroundSvg,
+            fit: BoxFit.cover,
+          ),
+          Center(child: SvgPicture.asset(AssetsPath.logoSvg)),
+        ],
       ),
     );
   }
