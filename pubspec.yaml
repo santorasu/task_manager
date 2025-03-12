@@ -30,7 +30,8 @@ flutter:
 
 
   assets:
-    - assets/images/
+    - assets/images/background.svg
+    - assets/images/logo.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
