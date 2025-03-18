@@ -39,6 +39,10 @@ class TaskManagerApp extends StatelessWidget {
               fontSize: 24,
               fontWeight: FontWeight.w600
           ),
+          bodyLarge: TextStyle(
+
+              fontWeight: FontWeight.w600
+          ),
         )
       ),
       home: SplashScreen(),
