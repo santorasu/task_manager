@@ -1,22 +1,21 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:task_management/ui/screens/reset_password_screen.dart';
 import 'package:task_management/ui/widgets/screen_background.dart';
 
 import 'login_screen.dart';
 
-class ForgotPasswordPinVerificationScreen extends StatefulWidget {
-  const ForgotPasswordPinVerificationScreen({super.key});
+class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordPinVerificationScreen> createState() =>
-      _ForgotPasswordPinVerificationScreenState();
+  State<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
-class _ForgotPasswordPinVerificationScreenState
-    extends State<ForgotPasswordPinVerificationScreen> {
-  final TextEditingController _pinCodeController = TextEditingController();
+class _ResetPasswordScreenState
+    extends State<ResetPasswordScreen> {
+  final TextEditingController _newPasswordTEController = TextEditingController();
+  final TextEditingController _confirmNewPasswordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -32,42 +31,34 @@ class _ForgotPasswordPinVerificationScreenState
               children: [
                 SizedBox(height: 80),
                 Text(
-                  "Pin Verification",
+                  "Set Password",
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 SizedBox(height: 4),
                 Text(
-                  "A 6 digit verification pin has been sent to your email",
+                  "Set a new password minimum length of 6 letters.",
                   style: Theme.of(
                     context,
                   ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                 ),
                 SizedBox(height: 24),
-                PinCodeTextField(
-                  length: 6,
-                  obscureText: false,
-                  animationType: AnimationType.fade,
-                  keyboardType: TextInputType.number,
-                  pinTheme: PinTheme(
-                    shape: PinCodeFieldShape.box,
-                    borderRadius: BorderRadius.circular(5),
-                    fieldHeight: 50,
-                    fieldWidth: 40,
-                    activeFillColor: Colors.white,
-                    selectedFillColor: Colors.white,
-                    inactiveFillColor: Colors.white,
+               TextFormField(
+                 textInputAction: TextInputAction.next,
+                 decoration: InputDecoration(
+                   hintText: "Enter New Password",
+                 ),
+               ),
+                SizedBox(height: 8),
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Confirm New Password",
                   ),
-                  animationDuration: const Duration(milliseconds: 300),
-                  backgroundColor: Colors.transparent,
-                  enableActiveFill: true,
-                  controller: _pinCodeController,
-                  appContext: context,
                 ),
 
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _onTapSubmitButton,
-                  child: const Text("verify"),
+                  child: Text("Confirm"),
                 ),
                 SizedBox(height: 16),
                 Center(
@@ -87,8 +78,8 @@ class _ForgotPasswordPinVerificationScreenState
                             fontWeight: FontWeight.bold,
                           ),
                           recognizer:
-                              TapGestureRecognizer()
-                                ..onTap = _onTapSignInButton,
+                          TapGestureRecognizer()
+                            ..onTap = _onTapSignInButton,
                         ),
                       ],
                     ),
@@ -102,10 +93,11 @@ class _ForgotPasswordPinVerificationScreenState
     );
   }
 
-
-  void _onTapSubmitButton(){
-    Navigator.push(
-      context, MaterialPageRoute(builder: (context)=> const ResetPasswordScreen())
+  void _onTapSubmitButton() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (pre) => false,
     );
   }
 
@@ -113,13 +105,13 @@ class _ForgotPasswordPinVerificationScreenState
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (pre) => false,
+          (pre) => false,
     );
   }
-
   @override
   void dispose() {
-    _pinCodeController.dispose();
+    _newPasswordTEController.dispose();
+    _confirmNewPasswordTEController.dispose();
     super.dispose();
   }
 }
