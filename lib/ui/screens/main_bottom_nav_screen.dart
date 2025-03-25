@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:task_management/ui/screens/progress_task_screen.dart';
+
+import '../widgets/tm_app_bar.dart';
+import 'new_tasks_screen.dart';
 
 class MainBottomNavScreen extends StatefulWidget {
   const MainBottomNavScreen({super.key});
@@ -10,11 +14,19 @@ class MainBottomNavScreen extends StatefulWidget {
 class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
   int _selectedIndex = 0;
 
+  List<Widget> _screens = [
+    NewTasksScreen(),
+    ProgressTaskScreen(),
+    NewTasksScreen(),
+    NewTasksScreen(),
+  ];
+
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: TMAppBar(),
+      body: _screens[_selectedIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
@@ -38,45 +50,4 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
   }
 }
 
-class TMAppBar extends StatelessWidget implements PreferredSize{
-  const TMAppBar({
-    super.key,
-  });
 
-
-  @override
-  Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    return AppBar(
-      backgroundColor: Colors.green,
-      title: Row(
-        children: [
-          CircleAvatar(radius: 16),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Santo Rasu",
-                style: textTheme.bodyLarge?.copyWith(color: Colors.white),
-              ),
-              Text(
-                'santorasu09@gmail.com',
-                style: textTheme.bodySmall?.copyWith(color: Colors.white),
-              ),
-            ],
-          ),
-          IconButton(onPressed: () {}, icon: Icon(Icons.logout)),
-        ],
-      ),
-    );
-  }
-
-  @override
-  // TODO: implement child
-  Widget get child => throw UnimplementedError();
-
-  @override
-  // TODO: implement preferredSize
-  Size get preferredSize => throw UnimplementedError();
-}
