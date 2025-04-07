@@ -10,7 +10,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _firstNameTEController = TextEditingController();
   final TextEditingController _lastNameTEController = TextEditingController();
@@ -24,7 +23,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: ScreenBackground(
         child: SingleChildScrollView(
           child: Padding(
-            key: _formKey,
             padding: const EdgeInsets.all(24),
             child: Form(
               key: _formKey,
@@ -34,40 +32,76 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(height: 80),
                   Text(
                     "Join With Us",
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .titleLarge,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   SizedBox(height: 24),
                   TextFormField(
-                      textInputAction: TextInputAction.next,
-                      keyboardType: TextInputType.emailAddress,
-                      controller: _emailTEController,
-                      decoration: InputDecoration(hintText: 'Email')),
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.emailAddress,
+                    controller: _emailTEController,
+                    decoration: InputDecoration(hintText: 'Email'),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Enter a valid Email';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
                   SizedBox(height: 8),
                   TextFormField(
                     textInputAction: TextInputAction.next,
                     controller: _firstNameTEController,
                     decoration: InputDecoration(hintText: 'First Name'),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Enter your first name';
+                      } else {
+                        return null;
+                      }
+                    },
                   ),
                   SizedBox(height: 8),
 
                   TextFormField(
-                      textInputAction: TextInputAction.next,
-                      controller: _lastNameTEController,
-                      decoration: InputDecoration(hintText: 'Last Name')),
+                    textInputAction: TextInputAction.next,
+                    controller: _lastNameTEController,
+                    decoration: InputDecoration(hintText: 'Last Name'),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Enter your last name';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
                   SizedBox(height: 8),
 
                   TextFormField(
-                      textInputAction: TextInputAction.next,
-                      keyboardType: TextInputType.phone,
-                      controller: _mobileTEController,
-                      decoration: InputDecoration(hintText: 'Mobile')),
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.phone,
+                    controller: _mobileTEController,
+                    decoration: InputDecoration(hintText: 'Mobile'),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Enter your phone number';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
                   SizedBox(height: 8),
                   TextFormField(
-                      controller: _passwordTEController,
-                      decoration: InputDecoration(hintText: 'Password')),
+                    controller: _passwordTEController,
+                    decoration: InputDecoration(hintText: 'Password'),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Enter your password';
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _onTabSubmitButton,
@@ -95,8 +129,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                             recognizer:
-                            TapGestureRecognizer()
-                              ..onTap = _onTapSignInButton,
+                                TapGestureRecognizer()
+                                  ..onTap = _onTapSignInButton,
                           ),
                         ],
                       ),
@@ -111,9 +145,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _onTabSubmitButton(){
+  void _onTabSubmitButton() {
+    if (_formKey.currentState!.validate()){
+    _registerUser();
+    }
+  }
 
-}
+  Future<void> _registerUser() async{
+
+  }
   void _onTapSignInButton() {
     Navigator.pop(context);
   }

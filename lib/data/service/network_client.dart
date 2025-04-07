@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart';
 import 'package:logger/logger.dart';
 
@@ -25,7 +24,12 @@ class NetWorkClient {
       Uri uri = Uri.parse(url);
       _preRequestLog(url);
       Response response = await get(uri);
-      _postRequestLog(url, response.statusCode, headers: response.headers, responseBody: response.body);
+      _postRequestLog(
+        url,
+        response.statusCode,
+        headers: response.headers,
+        responseBody: response.body,
+      );
       if (response.statusCode == 200) {
         final decodedJson = jsonDecode(response.body);
         return NetWorkResponse(
@@ -40,7 +44,7 @@ class NetWorkClient {
         );
       }
     } catch (e) {
-      _postRequestLog(url, -1, );
+      _postRequestLog(url, -1);
       return NetWorkResponse(
         isSuccess: false,
         statusCode: -1,
@@ -55,13 +59,18 @@ class NetWorkClient {
   }) async {
     try {
       Uri uri = Uri.parse(url);
-_preRequestLog(url,body: body);
+      _preRequestLog(url, body: body);
       Response response = await post(
         uri,
         headers: {'Content-Type': 'Application/json'},
         body: jsonEncode(body),
       );
-_postRequestLog(url, response.statusCode, headers: response.headers, responseBody: response.body);
+      _postRequestLog(
+        url,
+        response.statusCode,
+        headers: response.headers,
+        responseBody: response.body,
+      );
       if (response.statusCode == 200) {
         final decodedJson = jsonDecode(response.body);
         return NetWorkResponse(
@@ -76,7 +85,7 @@ _postRequestLog(url, response.statusCode, headers: response.headers, responseBod
         );
       }
     } catch (e) {
-     _postRequestLog(url, -1, errorMessage: e.toString());
+      _postRequestLog(url, -1, errorMessage: e.toString());
       return NetWorkResponse(
         isSuccess: false,
         statusCode: -1,
@@ -97,20 +106,20 @@ _postRequestLog(url, response.statusCode, headers: response.headers, responseBod
     int statusCode, {
     Map<String, dynamic>? headers,
     dynamic responseBody,
-        dynamic errorMessage,
+    dynamic errorMessage,
   }) {
     if (errorMessage != null) {
       _logger.e(
         'Url: $url'
-            'Status Code => $statusCode\n'
-            'Error Message => $errorMessage',
+        'Status Code => $statusCode\n'
+        'Error Message => $errorMessage',
       );
     } else {
       _logger.i(
         'Url: $url'
-            'Status Code => $statusCode\n'
-            'Header => $headers\n'
-            'Response => $responseBody',
+        'Status Code => $statusCode\n'
+        'Header => $headers\n'
+        'Response => $responseBody',
       );
     }
   }
