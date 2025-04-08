@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_management/ui/widgets/screen_background.dart';
@@ -41,11 +42,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _emailTEController,
                     decoration: InputDecoration(hintText: 'Email'),
                     validator: (String? value) {
-                      if (value?.trim().isEmpty ?? true) {
+                      String email = value?.trim() ?? '';
+                      if (EmailValidator.validate(email) == false) {
                         return 'Enter a valid Email';
-                      } else {
-                        return null;
                       }
+                      return null;
                     },
                   ),
                   SizedBox(height: 8),
@@ -83,7 +84,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _mobileTEController,
                     decoration: InputDecoration(hintText: 'Mobile'),
                     validator: (String? value) {
-                      if (value?.trim().isEmpty ?? true) {
+                      String phone = value?.trim() ?? '';
+                      RegExp regExp = RegExp(r"^(?:\\+88|88)?(01[3-9]\\d{8})$");
+                      if () {
                         return 'Enter your phone number';
                       } else {
                         return null;
@@ -146,14 +149,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _onTabSubmitButton() {
-    if (_formKey.currentState!.validate()){
-    _registerUser();
+    if (_formKey.currentState!.validate()) {
+      _registerUser();
     }
   }
 
-  Future<void> _registerUser() async{
-
-  }
+  Future<void> _registerUser() async {}
   void _onTapSignInButton() {
     Navigator.pop(context);
   }
