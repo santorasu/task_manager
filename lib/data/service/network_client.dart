@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:logger/logger.dart';
 
-class NetWorkResponse {
+class NetworkResponse {
   final bool isSuccess;
   final int statusCode;
   final Map<String, dynamic>? data;
-  final String? errorMessage;
+  final String errorMessage;
 
-  NetWorkResponse({
+  NetworkResponse({
     required this.isSuccess,
     required this.statusCode,
     this.data,
@@ -19,7 +19,7 @@ class NetWorkResponse {
 class NetWorkClient {
   static final Logger _logger = Logger();
 
-  static Future<NetWorkResponse> getRequest({required String url}) async {
+  static Future<NetworkResponse> getRequest({required String url}) async {
     try {
       Uri uri = Uri.parse(url);
       _preRequestLog(url);
@@ -32,20 +32,23 @@ class NetWorkClient {
       );
       if (response.statusCode == 200) {
         final decodedJson = jsonDecode(response.body);
-        return NetWorkResponse(
+        return NetworkResponse(
           isSuccess: true,
           statusCode: response.statusCode,
           data: decodedJson,
         );
       } else {
-        return NetWorkResponse(
+        final decodedJson = jsonDecode(response.body);
+        String errorMessage = decodedJson['data'] ?? 'Something Went Wrong!';
+        return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,
+          errorMessage: errorMessage,
         );
       }
     } catch (e) {
       _postRequestLog(url, -1);
-      return NetWorkResponse(
+      return NetworkResponse(
         isSuccess: false,
         statusCode: -1,
         errorMessage: e.toString(),
@@ -53,7 +56,7 @@ class NetWorkClient {
     }
   }
 
-  static Future<NetWorkResponse> postRequest({
+  static Future<NetworkResponse> postRequest({
     required String url,
     Map<String, dynamic>? body,
   }) async {
@@ -73,20 +76,23 @@ class NetWorkClient {
       );
       if (response.statusCode == 200) {
         final decodedJson = jsonDecode(response.body);
-        return NetWorkResponse(
+        return NetworkResponse(
           isSuccess: true,
           statusCode: response.statusCode,
           data: decodedJson,
         );
       } else {
-        return NetWorkResponse(
+        final decodedJson = jsonDecode(response.body);
+        String errorMessage = decodedJson['data'] ?? 'Something Went Wrong!';
+        return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,
+          errorMessage: errorMessage,
         );
       }
     } catch (e) {
       _postRequestLog(url, -1, errorMessage: e.toString());
-      return NetWorkResponse(
+      return NetworkResponse(
         isSuccess: false,
         statusCode: -1,
         errorMessage: e.toString(),
