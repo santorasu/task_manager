@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_management/data/service/network_client.dart';
+import 'package:task_management/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_management/ui/widgets/screen_background.dart';
 import 'package:task_management/ui/widgets/snack_bar_message.dart';
 
@@ -115,9 +116,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(height: 16),
                   Visibility(
                     visible: _registationInProgress == false,
-                    replacement: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    replacement: const CenteredCircularProgressIndicator(),
                     child: ElevatedButton(
                       onPressed: _onTabSubmitButton,
                       child: const Icon(
@@ -161,6 +160,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  void _clearTextFields(){
+    _emailTEController.clear();
+    _firstNameTEController.clear();
+    _lastNameTEController.clear();
+    _mobileTEController.clear();
+    _passwordTEController.clear();
+  }
+
   void _onTabSubmitButton() {
     if (_formKey.currentState!.validate()) {
       _registerUser();
@@ -184,6 +191,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _registationInProgress = false;
     setState(() {});
     if (response.isSuccess) {
+      _clearTextFields();
      showSnackBarBarMessage(context, "User register successfully!");
     } else {
       showSnackBarBarMessage(context, response.errorMessage,true);
