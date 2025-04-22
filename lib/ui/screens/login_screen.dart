@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_management/data/models/login_model.dart';
+import 'package:task_management/ui/controllers/auth_controller.dart';
 import 'package:task_management/ui/screens/register_screen.dart';
 import 'package:task_management/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_management/ui/widgets/screen_background.dart';
@@ -127,6 +129,12 @@ class _LoginScreenState extends State<LoginScreen> {
     _logInProgress = false;
     setState(() {});
     if (response.isSuccess) {
+      LoginModel loginModel = LoginModel.fromJson(response.data!);
+      // TODO: Save token to local Storage
+      AuthController.saveUserInformation(loginModel.token, loginModel.userModel);
+      // TOTO: local database setup and save user data
+      // TODO: Logged in/or not logged check hobe.
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => MainBottomNavScreen()),
