@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:task_management/ui/controllers/auth_controller.dart';
+import 'package:task_management/ui/screens/login_screen.dart';
 
 import '../screens/update_profile_screen.dart';
 
-class TMAppBar extends StatelessWidget implements PreferredSize{
-  const TMAppBar({
-    super.key, this.fromProfileScreen,
-  });
+class TMAppBar extends StatelessWidget implements PreferredSize {
+  const TMAppBar({super.key, this.fromProfileScreen});
 
   final bool? fromProfileScreen;
 
@@ -15,8 +15,8 @@ class TMAppBar extends StatelessWidget implements PreferredSize{
     return AppBar(
       backgroundColor: Colors.green,
       title: GestureDetector(
-        onTap: (){
-          if(fromProfileScreen ?? false){
+        onTap: () {
+          if (fromProfileScreen ?? false) {
             return;
           }
           _onTabProfileSection(context);
@@ -30,25 +30,41 @@ class TMAppBar extends StatelessWidget implements PreferredSize{
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Santo Rasu",
+                    AuthController.userModel?.fullName ?? 'Unknown',
                     style: textTheme.bodyLarge?.copyWith(color: Colors.white),
                   ),
                   Text(
-                    'santorasu09@gmail.com',
+                    AuthController.userModel?.email ?? 'Unknown',
                     style: textTheme.bodySmall?.copyWith(color: Colors.white),
                   ),
                 ],
               ),
             ),
-            IconButton(onPressed: () {}, icon: Icon(Icons.logout)),
+            IconButton(
+              onPressed: () => _onTabLogOutButton(context),
+              icon: Icon(Icons.logout),
+            ),
           ],
         ),
       ),
     );
   }
-void _onTabProfileSection(BuildContext context){
-    Navigator.push(context, MaterialPageRoute(builder: (context)=>UpdateProfileScreen()));
-}
+
+  void _onTabProfileSection(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UpdateProfileScreen()),
+    );
+  }
+
+  Future<void> _onTabLogOutButton(BuildContext context) async{
+    await AuthController.clearUserData();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (predicate) => false,
+    );
+  }
 
   @override
   // TODO: implement preferredSize
