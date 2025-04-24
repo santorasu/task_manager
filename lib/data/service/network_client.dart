@@ -1,6 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:logger/logger.dart';
+import 'package:task_management/ui/controllers/auth_controller.dart';
+import 'package:task_management/ui/screens/login_screen.dart';
+
+import '../../app.dart';
 
 class NetworkResponse {
   final bool isSuccess;
@@ -22,8 +27,9 @@ class NetWorkClient {
   static Future<NetworkResponse> getRequest({required String url}) async {
     try {
       Uri uri = Uri.parse(url);
-      _preRequestLog(url);
-      Response response = await get(uri);
+      Map<String, String> headers = {'token': AuthController.token ?? ''};
+      _preRequestLog(url, headers);
+      Response response = await get(uri, headers: headers);
       _postRequestLog(
         url,
         response.statusCode,
@@ -36,6 +42,13 @@ class NetWorkClient {
           isSuccess: true,
           statusCode: response.statusCode,
           data: decodedJson,
+        );
+      } else if (response.statusCode == 401) {
+        _moveToLoginScreen();
+        return NetworkResponse(
+          isSuccess: false,
+          statusCode: response.statusCode,
+          errorMessage: 'Session Expired, Please Login Again!',
         );
       } else {
         final decodedJson = jsonDecode(response.body);
@@ -62,10 +75,14 @@ class NetWorkClient {
   }) async {
     try {
       Uri uri = Uri.parse(url);
-      _preRequestLog(url, body: body);
+      Map<String, String> headers = {
+        'Content-Type': 'Application/json',
+        'token': AuthController.token ?? '',
+      };
+      _preRequestLog(url, headers, body: body);
       Response response = await post(
         uri,
-        headers: {'Content-Type': 'Application/json'},
+        headers: headers,
         body: jsonEncode(body),
       );
       _postRequestLog(
@@ -80,6 +97,13 @@ class NetWorkClient {
           isSuccess: true,
           statusCode: response.statusCode,
           data: decodedJson,
+        );
+      } else if (response.statusCode == 401) {
+        _moveToLoginScreen();
+        return NetworkResponse(
+          isSuccess: false,
+          statusCode: response.statusCode,
+          errorMessage: 'Session Expired, Please Login Again!',
         );
       } else {
         final decodedJson = jsonDecode(response.body);
@@ -100,9 +124,13 @@ class NetWorkClient {
     }
   }
 
-  static void _preRequestLog(String url, {Map<String, dynamic>? body}) {
+  static void _preRequestLog(
+    String url,
+    Map<String, String> headers, {
+    Map<String, dynamic>? body,
+  }) {
     _logger.i(
-      'URL => $url\n'
+      'URL => $url\n Headers: $headers\n'
       'Body => $body',
     );
   }
@@ -128,5 +156,14 @@ class NetWorkClient {
         'Response => $responseBody',
       );
     }
+  }
+
+  static void _moveToLoginScreen() async {
+    await AuthController.clearUserData();
+    Navigator.pushAndRemoveUntil(
+      TaskManagerApp.navigatorKey.currentContext!,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (predicate) => false,
+    );
   }
 }

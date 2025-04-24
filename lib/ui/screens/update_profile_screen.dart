@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:task_management/ui/controllers/auth_controller.dart';
+import 'package:task_management/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_management/ui/widgets/screen_background.dart';
 import 'package:task_management/ui/widgets/tm_app_bar.dart';
 
 import '../../data/models/user_model.dart';
+import '../../data/service/network_client.dart';
+import '../../data/utils/urls.dart';
+import '../widgets/snack_bar_message.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -22,6 +28,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ImagePicker _imagePicker = ImagePicker();
+
+  bool _updateProfileInProgress = false;
   XFile? _pickedImage;
 
   @override
@@ -127,12 +135,16 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               
                   SizedBox(height: 16),
               
-                  ElevatedButton(
-                    onPressed: _onTapSubmitButton,
-                    child: const Icon(
-                      Icons.arrow_circle_right_outlined,
-                      color: Colors.white,
-                      size: 24,
+                  Visibility(
+                    visible: _updateProfileInProgress == false,
+                    replacement: const CenteredCircularProgressIndicator(),
+                    child: ElevatedButton(
+                      onPressed: _onTapSubmitButton,
+                      child: const Icon(
+                        Icons.arrow_circle_right_outlined,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ],
@@ -147,6 +159,43 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void _onTapSubmitButton() {
     if(_formKey.currentState!.validate()){
   //update profile
+      _updateProfile();
+    }
+  }
+
+  Future<void> _updateProfile() async {
+    _updateProfileInProgress = true;
+    setState(() {});
+    Map<String, dynamic> requestBody = {
+      "email": _emailTEController.text.trim(),
+      "firstName": _firstNameTEController.text.trim(),
+      "lastName": _lastNameTEController.text.trim(),
+      "mobile": _mobileTEController.text.trim(),
+    };
+    if(_passwordTEController.text.isNotEmpty){
+      requestBody['password'] = _passwordTEController.text;
+    }
+
+    if(_pickedImage != null){
+      List<int> imageBytes = await _pickedImage!.readAsBytes();
+      String encodedImage = base64Encode(imageBytes);
+      requestBody['photo'] = encodedImage;
+    }
+    NetworkResponse response = await NetWorkClient.postRequest(
+      url: Urls.updateProfileUrl,
+      body: requestBody,
+    );
+    _updateProfileInProgress = false;
+    setState(() {});
+    if (response.isSuccess) {
+      // todo Update user data
+      setState(() {
+
+      });
+      _passwordTEController.clear();
+      showSnackBarBarMessage(context, "User data Update successfully!");
+    } else {
+      showSnackBarBarMessage(context, response.errorMessage,true);
     }
   }
 
