@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       "password": _passwordTEController.text,
     };
-    NetworkResponse response = await NetWorkClient.postRequest(
+    NetworkResponse response = await NetworkClient.postRequest(
       url: Urls.loginUrl,
       body: requestBody,
     );

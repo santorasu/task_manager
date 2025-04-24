@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:task_management/ui/controllers/auth_controller.dart';
+import 'package:task_management/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_management/ui/widgets/screen_background.dart';
 import 'package:task_management/ui/widgets/tm_app_bar.dart';
 
 import '../../data/models/user_model.dart';
+import '../../data/service/network_client.dart';
+import '../../data/utils/urls.dart';
+import '../widgets/snack_bar_message.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -22,6 +28,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ImagePicker _imagePicker = ImagePicker();
+
+  bool _updateProfileInProgress = false;
   XFile? _pickedImage;
 
   @override
@@ -53,7 +61,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   Text("Update Profile",
                     style: Theme.of(context).textTheme.titleLarge,),
                   SizedBox(height: 24,),
-              
+
                   _buildPhotoPickerWidget(),
                   SizedBox(height: 8,),
                   TextFormField(
@@ -65,7 +73,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       hintText: 'Email',
                     ),
                   ),
-              
+
                   SizedBox(height: 8,),
                   TextFormField(
                     controller: _firstNameTEController,
@@ -80,7 +88,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       return null;
                     },
                   ),
-              
+
                   SizedBox(height: 8,),
                   TextFormField(
                     controller: _lastNameTEController,
@@ -95,7 +103,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       return null;
                     },
                   ),
-              
+
                   SizedBox(height: 8,),
                   TextFormField(
                     controller: _mobileTEController,
@@ -115,7 +123,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       return null;
                     },
                   ),
-              
+
                   SizedBox(height: 8,),
                   TextFormField(
                     obscureText: true,
@@ -124,15 +132,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       hintText: 'Password',
                     ),
                   ),
-              
+
                   SizedBox(height: 16),
-              
-                  ElevatedButton(
-                    onPressed: _onTapSubmitButton,
-                    child: const Icon(
-                      Icons.arrow_circle_right_outlined,
-                      color: Colors.white,
-                      size: 24,
+
+                  Visibility(
+                    visible: _updateProfileInProgress == false,
+                    replacement: const CenteredCircularProgressIndicator(),
+                    child: ElevatedButton(
+                      onPressed: _onTapSubmitButton,
+                      child: const Icon(
+                        Icons.arrow_circle_right_outlined,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ],
@@ -146,7 +158,44 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   void _onTapSubmitButton() {
     if(_formKey.currentState!.validate()){
-  //update profile
+      //update profile
+      _updateProfile();
+    }
+  }
+
+  Future<void> _updateProfile() async {
+    _updateProfileInProgress = true;
+    setState(() {});
+    Map<String, dynamic> requestBody = {
+      "email": _emailTEController.text.trim(),
+      "firstName": _firstNameTEController.text.trim(),
+      "lastName": _lastNameTEController.text.trim(),
+      "mobile": _mobileTEController.text.trim(),
+    };
+    if(_passwordTEController.text.isNotEmpty){
+      requestBody['password'] = _passwordTEController.text;
+    }
+
+    if(_pickedImage != null){
+      List<int> imageBytes = await _pickedImage!.readAsBytes();
+      String encodedImage = base64Encode(imageBytes);
+      requestBody['photo'] = encodedImage;
+    }
+    NetworkResponse response = await NetworkClient.postRequest(
+      url: Urls.updateProfileUrl,
+      body: requestBody,
+    );
+    _updateProfileInProgress = false;
+    setState(() {});
+    if (response.isSuccess) {
+      // todo Update user data
+      setState(() {
+
+      });
+      _passwordTEController.clear();
+      showSnackBarBarMessage(context, "User data Update successfully!");
+    } else {
+      showSnackBarBarMessage(context, response.errorMessage,true);
     }
   }
 
@@ -154,43 +203,43 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     return GestureDetector(
       onTap: _onTapPhotoPicker,
       child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 50,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            bottomLeft: Radius.circular(8),
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text('Photo',style: TextStyle(
-                          color: Colors.white,
-                        ),),
-                      ),
-                      SizedBox(height: 8,),
-                      Text(_pickedImage?.name ??"Select Your Photo")
-                    ],
-                  ),
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              height: 50,
+              width: 80,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
                 ),
+              ),
+              alignment: Alignment.center,
+              child: Text('Photo',style: TextStyle(
+                color: Colors.white,
+              ),),
+            ),
+            SizedBox(height: 8,),
+            Text(_pickedImage?.name ??"Select Your Photo")
+          ],
+        ),
+      ),
     );
   }
 
   void _onTapPhotoPicker() async{
     XFile? image =await _imagePicker.pickImage(source: ImageSource.gallery);
     if(image != null){
-    _pickedImage = image;
-    setState(() {
+      _pickedImage = image;
+      setState(() {
 
-    });
+      });
     }
   }
 }

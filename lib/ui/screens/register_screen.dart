@@ -184,7 +184,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       "mobile": _mobileTEController.text.trim(),
       "password": _passwordTEController.text,
     };
-    NetworkResponse response = await NetWorkClient.postRequest(
+    NetworkResponse response = await NetworkClient.postRequest(
       url: Urls.registerUrl,
       body: requestBody,
     );
