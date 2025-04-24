@@ -72,6 +72,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     decoration: InputDecoration(
                       hintText: 'Email',
                     ),
+                    validator: (String? value) {
+                      if ((value?.isEmpty ?? true) || (value!.length < 6)) {
+                        return 'Enter your Email';
+                      } else {
+                        return null;
+                      }
+                    },
                   ),
 
                   SizedBox(height: 8,),

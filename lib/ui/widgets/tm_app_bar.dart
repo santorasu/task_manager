@@ -1,17 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:task_management/ui/controllers/auth_controller.dart';
-import 'package:task_management/ui/screens/login_screen.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import '../controllers/auth_controller.dart';
+import '../screens/login_screen.dart';
 import '../screens/update_profile_screen.dart';
 
-class TMAppBar extends StatelessWidget implements PreferredSize {
-  const TMAppBar({super.key, this.fromProfileScreen});
+class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const TMAppBar({
+    super.key,
+    this.fromProfileScreen,
+  });
 
   final bool? fromProfileScreen;
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+
     return AppBar(
       backgroundColor: Colors.green,
       title: GestureDetector(
@@ -19,19 +24,27 @@ class TMAppBar extends StatelessWidget implements PreferredSize {
           if (fromProfileScreen ?? false) {
             return;
           }
-          _onTabProfileSection(context);
+          _onTapProfileSection(context);
         },
         child: Row(
           children: [
-            CircleAvatar(radius: 16),
+            CircleAvatar(
+              radius: 16,
+              backgroundImage: _shouldShowImage(AuthController.userModel?.photo)
+                  ? MemoryImage(
+                base64Decode(AuthController.userModel?.photo ?? ''),
+              ): null,
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AuthController.userModel?.fullName ?? 'Unknown',
-                    style: textTheme.bodyLarge?.copyWith(color: Colors.white),
+                    AuthController.userModel?.fulName ?? 'Unknown',
+                    style: textTheme.bodyLarge?.copyWith(
+                      color: Colors.white,
+                    ),
                   ),
                   Text(
                     AuthController.userModel?.email ?? 'Unknown',
@@ -41,36 +54,33 @@ class TMAppBar extends StatelessWidget implements PreferredSize {
               ),
             ),
             IconButton(
-              onPressed: () => _onTabLogOutButton(context),
-              icon: Icon(Icons.logout),
-            ),
+                onPressed: () => _onTapLogOutButton(context),
+                icon: const Icon(Icons.logout))
           ],
         ),
       ),
     );
   }
 
-  void _onTabProfileSection(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => UpdateProfileScreen()),
-    );
+  bool _shouldShowImage(String? photo) {
+    return photo != null && photo.isNotEmpty;
   }
 
-  Future<void> _onTabLogOutButton(BuildContext context) async{
+  void _onTapProfileSection(BuildContext context) {
+    Navigator.push(context,
+      MaterialPageRoute(builder: (context) => const UpdateProfileScreen(),),);
+  }
+
+  Future<void> _onTapLogOutButton(BuildContext context) async {
     await AuthController.clearUserData();
     Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-      (predicate) => false,
-    );
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+            (predicate) => false);
   }
 
   @override
-  // TODO: implement preferredSize
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
-
-  @override
-  // TODO: implement child
-  Widget get child => throw UnimplementedError();
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
