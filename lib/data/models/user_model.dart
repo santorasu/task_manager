@@ -26,30 +26,31 @@ class UserModel {
   late final String lastName;
   late final String mobile;
   late final String createdDate;
-
+  late final String photo;
 
   // named constructor
-  UserModel.formJson(Map<String, dynamic> jsonData){
+  UserModel.fromJson(Map<String, dynamic> jsonData) {
     id = jsonData['_id'] ?? '';
     email = jsonData['email'] ?? '';
     firstName = jsonData['firstName'] ?? '';
     lastName = jsonData['lastName'] ?? '';
     mobile = jsonData['mobile'] ?? '';
     createdDate = jsonData['createdDate'] ?? '';
+    photo = jsonData['photo'] ?? '';
   }
 
-  Map<String, dynamic> toJson(){
+  Map<String, dynamic> toJson() {
     return {
-      '_id' : id,
-      'email' : email,
-      'firstName' : firstName,
-      'lastName' : lastName,
-      'mobile' : mobile,
-      'createdDate' : createdDate,
+      '_id': id,
+      'email': email,
+      'firstName': firstName,
+      'lastName': lastName,
+      'mobile': mobile,
+      'createdDate': createdDate,
     };
   }
 
-  String get fullName {
+  String get fulName {
     return '$firstName $lastName';
   }
 }
