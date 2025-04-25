@@ -11,7 +11,8 @@ import 'package:task_management/ui/widgets/snack_bar_message.dart';
 import 'login_screen.dart';
 
 class ForgotPasswordPinVerificationScreen extends StatefulWidget {
-  const ForgotPasswordPinVerificationScreen({super.key, required String email});
+  final String email;
+  const ForgotPasswordPinVerificationScreen({super.key, required this.email});
 
   @override
   State<ForgotPasswordPinVerificationScreen> createState() =>
@@ -22,10 +23,9 @@ class _ForgotPasswordPinVerificationScreenState
     extends State<ForgotPasswordPinVerificationScreen> {
   final TextEditingController _pinCodeController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String? receivedEmail;
-
   bool _isOtpInProgress = false;
   bool _isDisposed = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,9 +45,7 @@ class _ForgotPasswordPinVerificationScreenState
                 SizedBox(height: 4),
                 Text(
                   "A 6 digit verification pin has been sent to your email",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                 ),
                 SizedBox(height: 24),
                 PinCodeTextField(
@@ -70,7 +68,7 @@ class _ForgotPasswordPinVerificationScreenState
                   controller: _pinCodeController,
                   appContext: context,
                   validator: (String? value) {
-                    if (value!.trim().isEmpty == true) {
+                    if (value!.trim().isEmpty) {
                       return 'Please enter your OTP';
                     } else if (value.trim().length < 6) {
                       return 'Please enter a valid OTP';
@@ -78,18 +76,16 @@ class _ForgotPasswordPinVerificationScreenState
                     return null;
                   },
                 ),
-
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _onTapSubmitButton,
-                  child:  Visibility(
-                      visible: _isOtpInProgress == false,
-                      replacement: const CenteredCircularProgressIndicator(),
-                      child: Text("verify")),
+                  child: Visibility(
+                    visible: !_isOtpInProgress,
+                    replacement: const CenteredCircularProgressIndicator(),
+                    child: const Text("Verify"),
+                  ),
                 ),
                 SizedBox(height: 16),
-
-
                 Center(
                   child: RichText(
                     text: TextSpan(
@@ -99,16 +95,15 @@ class _ForgotPasswordPinVerificationScreenState
                         fontSize: 14,
                       ),
                       children: [
-                        TextSpan(text: "Already Have an account? "),
+                        const TextSpan(text: "Already Have an account? "),
                         TextSpan(
                           text: "Sign In",
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
                           ),
-                          recognizer:
-                              TapGestureRecognizer()
-                                ..onTap = _onTapSignInButton,
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = _onTapSignInButton,
                         ),
                       ],
                     ),
@@ -122,58 +117,76 @@ class _ForgotPasswordPinVerificationScreenState
     );
   }
 
-
-  void _onTapSubmitButton(){
-    Navigator.push(
-      context, MaterialPageRoute(builder: (context)=> const ResetPasswordScreen())
-    );
+  void _onTapSubmitButton() {
+    if (_formKey.currentState!.validate()) {
+      forgetPasswordOTPVerify();
+    }
   }
 
   Future<void> forgetPasswordOTPVerify() async {
     final String otp = _pinCodeController.text;
     if (_isDisposed) return;
 
-    Map<String,dynamic> authDataForSetPassword= {'email': receivedEmail, 'OTP': otp};
+    setState(() {
+      _isOtpInProgress = true;
+    });
 
-
-    _isOtpInProgress = true;
-    setState(() {});
+    Map<String, dynamic> authDataForSetPassword = {
+      'email': widget.email,
+      'OTP': otp,
+    };
 
     String url = Urls.otpVerifyUrl(
-      email: receivedEmail,
+      email: widget.email,
       otp: otp,
     );
-    NetworkResponse response = await NetworkClient.getRequest(url: url);
-    if (_isDisposed) return;
-    _pinCodeController.clear();
-    if (!mounted) return;
-    if (response.statusCode == 200) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/resetPassword',
-            (route) => false,
-        arguments: authDataForSetPassword,
-      );
-      return;
-    } else {
-      showSnackBarMessage(context, 'Invalid OTP !!!', true);
+
+    try {
+      NetworkResponse response = await NetworkClient.getRequest(url: url);
+
+      if (_isDisposed) return;
+      _pinCodeController.clear();
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResetPasswordScreen(),
+            settings: RouteSettings(
+              arguments: {
+                'email': widget.email,
+                'OTP': otp,
+              },
+            ),
+          ),
+        );
+      } else {
+        showSnackBarMessage(context, 'Invalid OTP !!!', true);
+      }
+    } catch (error) {
+      if (_isDisposed) return;
+      showSnackBarMessage(context, 'An error occurred. Please try again.', true);
+    } finally {
+      setState(() {
+        _isOtpInProgress = false;
+      });
     }
-    _isOtpInProgress = false;
-    setState(() {});
   }
 
   void _onTapSignInButton() {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (pre) => false,
+          (pre) => false,
     );
   }
-
 
   @override
   void dispose() {
     _pinCodeController.dispose();
+    _isDisposed = true;
     super.dispose();
   }
 }

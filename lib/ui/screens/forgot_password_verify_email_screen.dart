@@ -99,14 +99,12 @@ class _ForgotPasswordVerifyEmailScreenState extends State<ForgotPasswordVerifyEm
     );
   }
 
-  // Handle form submission
   void _onTapSubmitButton() {
     if (_formKey.currentState!.validate()) {
       forgetPasswordEmailVerify();
     }
   }
 
-  // API call to verify email
   Future<void> forgetPasswordEmailVerify() async {
     setState(() {
       isLoading = true;
@@ -140,12 +138,11 @@ class _ForgotPasswordVerifyEmailScreenState extends State<ForgotPasswordVerifyEm
     }
   }
 
-  // Navigate back to Sign In screen
   void _onTapSignInButton() {
     Navigator.pop(context);
   }
 
-  // Custom email validation
+
   String? _emailValidator(String value) {
     if (value.trim().isEmpty) {
       return 'Enter your mail address';

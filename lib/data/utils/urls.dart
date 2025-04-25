@@ -24,4 +24,5 @@ class Urls{
     return '$_baseUrl/RecoverVerifyOtp/$email/$otp';
   }
 
+
 }
