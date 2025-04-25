@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-void showSnackBarBarMessage(
+void showSnackBarMessage(
   BuildContext context,
   String message, [
   bool isError = false,

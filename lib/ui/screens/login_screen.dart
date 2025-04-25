@@ -141,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
         (predicate) => false,
       );
     } else {
-      showSnackBarBarMessage(context, response.errorMessage, true);
+      showSnackBarMessage(context, response.errorMessage, true);
     }
   }
 

@@ -192,9 +192,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {});
     if (response.isSuccess) {
       _clearTextFields();
-     showSnackBarBarMessage(context, "User register successfully!");
+     showSnackBarMessage(context, "User register successfully!");
     } else {
-      showSnackBarBarMessage(context, response.errorMessage,true);
+      showSnackBarMessage(context, response.errorMessage,true);
     }
   }
 
