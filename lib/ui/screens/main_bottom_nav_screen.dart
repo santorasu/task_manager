@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:task_management/ui/screens/cancelled_task_screen.dart';
-import 'package:task_management/ui/screens/completed_task_screen.dart';
-import 'package:task_management/ui/screens/progress_task_screen.dart';
-
+import 'package:flutter/material.dart';import 'package:task_management/ui/screens/progress_task_screen.dart';
 import '../widgets/tm_app_bar.dart';
+import 'cancelled_task_screen.dart';
+import 'completed_task_screen.dart';
 import 'new_tasks_screen.dart';
 
 class MainBottomNavScreen extends StatefulWidget {
@@ -17,7 +15,7 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = const [
-    NewTasksScreen(),
+    NewTaskScreen(),
     ProgressTaskScreen(),
     CompletedTaskScreen(),
     CancelledTaskScreen(),
@@ -25,9 +23,8 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: TMAppBar(),
+      appBar: const TMAppBar(),
       body: _screens[_selectedIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
@@ -35,13 +32,19 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
           _selectedIndex = index;
           setState(() {});
         },
-        destinations: [
-          NavigationDestination(icon: Icon(Icons.new_label), label: 'New'),
+        destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.format_indent_increase_outlined),
+            icon: Icon(Icons.new_label),
+            label: 'New',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.ac_unit_sharp),
             label: 'Progress',
           ),
-          NavigationDestination(icon: Icon(Icons.done), label: 'Complete'),
+          NavigationDestination(
+            icon: Icon(Icons.done),
+            label: 'Complete',
+          ),
           NavigationDestination(
             icon: Icon(Icons.cancel_outlined),
             label: 'Cancelled',
@@ -51,5 +54,3 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
     );
   }
 }
-
-
