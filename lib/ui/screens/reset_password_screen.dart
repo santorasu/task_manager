@@ -16,15 +16,16 @@ class ResetPasswordScreen extends StatefulWidget {
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final TextEditingController _newPasswordTEController = TextEditingController();
-  final TextEditingController _confirmNewPasswordTEController = TextEditingController();
+  final TextEditingController _newPasswordTEController =
+      TextEditingController();
+  final TextEditingController _confirmNewPasswordTEController =
+      TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  bool _isPasswordVisible = false;
+  bool _passwordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _resetInProgress = false;
 
-  // Declare variables to store the email and OTP
   late String email;
   late String otp;
 
@@ -32,8 +33,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Retrieve arguments passed to this screen
-    final arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     email = arguments['email'];
     otp = arguments['OTP'];
   }
@@ -57,14 +58,31 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 SizedBox(height: 4),
                 Text(
                   "Set a new password minimum length of 6 letters.",
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                 ),
                 SizedBox(height: 24),
                 TextFormField(
                   controller: _newPasswordTEController,
                   textInputAction: TextInputAction.next,
+                  obscureText: !_passwordVisible, // Controls visibility
                   decoration: InputDecoration(
                     hintText: "Enter New Password",
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        // Set the icon based on password visibility
+                        _passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _passwordVisible =
+                              !_passwordVisible;
+                        });
+                      },
+                    ),
                   ),
                   validator: (String? value) {
                     if ((value?.isEmpty ?? true) || (value!.length < 6)) {
@@ -73,19 +91,35 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     return null;
                   },
                 ),
+
                 SizedBox(height: 8),
                 TextFormField(
                   controller: _confirmNewPasswordTEController,
+                  obscureText: !_isConfirmPasswordVisible,
                   decoration: InputDecoration(
                     hintText: "Confirm New Password",
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                        });
+                      },
+                    ),
                   ),
                   validator: (String? value) {
                     if ((value?.isEmpty ?? true) || (value!.length < 6)) {
                       return 'Enter your password more than 6 characters';
                     }
+                    if (value != _newPasswordTEController.text) {
+                      return 'Passwords do not match';
+                    }
                     return null;
                   },
                 ),
+
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _onTapSubmitButton,
@@ -112,8 +146,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
                           ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = _onTapSignInButton,
+                          recognizer:
+                              TapGestureRecognizer()
+                                ..onTap = _onTapSignInButton,
                         ),
                       ],
                     ),
@@ -127,14 +162,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  // Submit Button Handler
   void _onTapSubmitButton() {
     if (_formKey.currentState!.validate()) {
       resetPassword();
     }
   }
 
-  // Reset password API call
   Future<void> resetPassword() async {
     setState(() {
       _resetInProgress = true;
@@ -142,10 +175,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     String newPassword = _newPasswordTEController.text;
 
-    // Create the request body with email, OTP, and new password
     Map<String, dynamic> requestBody = {
-      "email": email,  // Use the email passed from previous screen
-      "OTP": otp,      // Use the OTP passed from previous screen
+      "email": email,
+      "OTP": otp,
       "password": newPassword,
     };
 
@@ -161,7 +193,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
-            (pre) => false,
+        (pre) => false,
       );
     } else {
       showSnackBarMessage(context, 'Failed to reset password', true);
@@ -172,12 +204,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     });
   }
 
-  // Navigate to Sign In screen
   void _onTapSignInButton() {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
-          (pre) => false,
+      (pre) => false,
     );
   }
 

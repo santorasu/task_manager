@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_management/data/models/login_model.dart';
@@ -23,6 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool _passwordVisible = false;
   bool _logInProgress = false;
   @override
   Widget build(BuildContext context) {
@@ -46,13 +49,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailTEController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(hintText: 'Email'),
+                  validator: (String? value) {
+                    String email = value?.trim() ?? '';
+                    if (EmailValidator.validate(email) == false) {
+                      return 'Enter a valid Email';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 8),
                 TextFormField(
                   controller: _passwordTEController,
-                  obscureText: true,
-                  decoration: InputDecoration(hintText: 'Password'),
+                  obscureText: !_passwordVisible, // Toggle password visibility
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _passwordVisible ? Icons.visibility : Icons.visibility_off, // Toggle between eye icons
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _passwordVisible = !_passwordVisible; // Toggle password visibility
+                        });
+                      },
+                    ),
+                  ),
+                  validator: (String? value) {
+                    if ((value?.isEmpty ?? true) || (value!.length < 6)) {
+                      return 'Enter your password more than 6 characters';
+                    }
+                    return null;
+                  },
                 ),
+
                 SizedBox(height: 16),
                 Visibility(
                   visible: _logInProgress == false,
@@ -130,10 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {});
     if (response.isSuccess) {
       LoginModel loginModel = LoginModel.fromJson(response.data!);
-      // TODO: Save token to local Storage
       AuthController.saveUserInformation(loginModel.token, loginModel.userModel);
-      // TOTO: local database setup and save user data
-      // TODO: Logged in/or not logged check hobe.
 
       Navigator.pushAndRemoveUntil(
         context,

@@ -21,7 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _lastNameTEController = TextEditingController();
   final TextEditingController _mobileTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
-  bool _registationInProgress = false;
+  bool _registrationInProgress = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -115,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 16),
                   Visibility(
-                    visible: _registationInProgress == false,
+                    visible: _registrationInProgress == false,
                     replacement: const CenteredCircularProgressIndicator(),
                     child: ElevatedButton(
                       onPressed: _onTabSubmitButton,
@@ -175,7 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _registerUser() async {
-    _registationInProgress = true;
+    _registrationInProgress = true;
     setState(() {});
     Map<String, dynamic> requestBody = {
       "email": _emailTEController.text.trim(),
@@ -188,7 +188,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       url: Urls.registerUrl,
       body: requestBody,
     );
-    _registationInProgress = false;
+    _registrationInProgress = false;
     setState(() {});
     if (response.isSuccess) {
       _clearTextFields();
