@@ -6,6 +6,8 @@ import 'package:task_management/data/utils/urls.dart';
 import 'package:task_management/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_management/ui/widgets/snack_bar_message.dart';
 
+import '../screens/main_bottom_nav_screen.dart';
+
 enum TaskStatus { sNew, progress, completed, cancelled }
 
 class TaskCard extends StatefulWidget {
@@ -188,6 +190,7 @@ class _TaskCardState extends State<TaskCard> {
     _inProgress = false;
     if (response.isSuccess) {
       widget.refreshList();
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MainBottomNavScreen()));
     } else {
       setState(() {});
       showSnackBarMessage(context, response.errorMessage, true);
