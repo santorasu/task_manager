@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:task_management/ui/controllers/auth_controller.dart';
+import 'package:task_management/ui/screens/main_bottom_nav_screen.dart';
 import 'package:task_management/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_management/ui/widgets/screen_background.dart';
 import 'package:task_management/ui/widgets/tm_app_bar.dart';
@@ -195,10 +196,18 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     _updateProfileInProgress = false;
     setState(() {});
     if (response.isSuccess) {
-      // todo Update user data
-      setState(() {
+      // Update AuthController's user model with the updated data
+      AuthController.userModel!.firstName = _firstNameTEController.text.trim();
+      AuthController.userModel!.lastName = _lastNameTEController.text.trim();
+      AuthController.userModel!.mobile = _mobileTEController.text.trim();
 
-      });
+      showSnackBarMessage(context, "Profile updated successfully!");
+
+      //Navigator.pop(context);
+setState(() {
+
+});
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MainBottomNavScreen()));
       _passwordTEController.clear();
       showSnackBarMessage(context, "User data Update successfully!");
     } else {
