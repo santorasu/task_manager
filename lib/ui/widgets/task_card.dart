@@ -5,6 +5,7 @@ import 'package:task_management/data/service/network_client.dart';
 import 'package:task_management/data/utils/urls.dart';
 import 'package:task_management/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_management/ui/widgets/snack_bar_message.dart';
+
 enum TaskStatus { sNew, progress, completed, cancelled }
 
 class TaskCard extends StatefulWidget {
@@ -43,10 +44,7 @@ class _TaskCardState extends State<TaskCard> {
             ),
             Text(widget.taskModel.description),
             Text(
-              "Date: ${DateFormatter.formatDateTime(
-                dateTime: DateTime.parse(widget.taskModel.createdDate),
-                outputFormat: 'dd/MM/yyyy',
-              )}",
+              "Date: ${DateFormatter.formatDateTime(dateTime: DateTime.parse(widget.taskModel.createdDate), outputFormat: 'dd/MM/yyyy')}",
             ),
 
             Row(
@@ -74,13 +72,14 @@ class _TaskCardState extends State<TaskCard> {
                         icon: const Icon(Icons.delete),
                       ),
                       IconButton(
-                          onPressed: _showUpdateStatusDialog,
-                          icon: const Icon(Icons.edit)),
+                        onPressed: _showUpdateStatusDialog,
+                        icon: const Icon(Icons.edit),
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -103,60 +102,58 @@ class _TaskCardState extends State<TaskCard> {
   }
 
   void _showUpdateStatusDialog() {
-    showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        title: const Text('Update status'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              onTap: () {
-                _popDialog();
-                if (isSelected('New')) return;
-                _changeTaskStatus('New');
-              },
-              title: const Text('New'),
-              trailing: isSelected('New')
-                  ? const Icon(Icons.done)
-                  : null,
-            ),
-            ListTile(
-              onTap: () {
-                _popDialog();
-                if (isSelected('Progress')) return;
-                _changeTaskStatus('Progress');
-              },
-              title: const Text('Progress'),
-              trailing: isSelected('Progress')
-                  ? const Icon(Icons.done)
-                  : null,
-            ),
-            ListTile(
-              onTap: () {
-                _popDialog();
-                if (isSelected('Completed')) return;
-                _changeTaskStatus('Completed');
-              },
-              title: const Text('Completed'),
-              trailing: isSelected('Completed')
-                  ? const Icon(Icons.done)
-                  : null,
-            ),
-            ListTile(
-              onTap: () {
-                _popDialog();
-                if (isSelected('Cancelled')) return;
-                _changeTaskStatus('Cancelled');
-              },
-              title: const Text('Cancelled'),
-              trailing: isSelected('Cancelled')
-                  ? const Icon(Icons.done)
-                  : null,
-            ),
-          ],
-        ),
-      );
-    });
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Update status'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () {
+                  _popDialog();
+                  if (isSelected('New')) return;
+                  _changeTaskStatus('New');
+                },
+                title: const Text('New'),
+                trailing: isSelected('New') ? const Icon(Icons.done) : null,
+              ),
+              ListTile(
+                onTap: () {
+                  _popDialog();
+                  if (isSelected('Progress')) return;
+                  _changeTaskStatus('Progress');
+                },
+                title: const Text('Progress'),
+                trailing:
+                    isSelected('Progress') ? const Icon(Icons.done) : null,
+              ),
+              ListTile(
+                onTap: () {
+                  _popDialog();
+                  if (isSelected('Completed')) return;
+                  _changeTaskStatus('Completed');
+                },
+                title: const Text('Completed'),
+                trailing:
+                    isSelected('Completed') ? const Icon(Icons.done) : null,
+              ),
+              ListTile(
+                onTap: () {
+                  _popDialog();
+                  if (isSelected('Cancelled')) return;
+                  _changeTaskStatus('Cancelled');
+                },
+                title: const Text('Cancelled'),
+                trailing:
+                    isSelected('Cancelled') ? const Icon(Icons.done) : null,
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _popDialog() {
@@ -169,7 +166,8 @@ class _TaskCardState extends State<TaskCard> {
     _inProgress = true;
     setState(() {});
     final NetworkResponse response = await NetworkClient.getRequest(
-        url: Urls.updateTaskStatusUrl(widget.taskModel.id, status));
+      url: Urls.updateTaskStatusUrl(widget.taskModel.id, status),
+    );
 
     _inProgress = false;
     if (response.isSuccess) {
@@ -184,7 +182,8 @@ class _TaskCardState extends State<TaskCard> {
     _inProgress = true;
     setState(() {});
     final NetworkResponse response = await NetworkClient.getRequest(
-        url: Urls.deleteTaskUrl(widget.taskModel.id));
+      url: Urls.deleteTaskUrl(widget.taskModel.id),
+    );
 
     _inProgress = false;
     if (response.isSuccess) {

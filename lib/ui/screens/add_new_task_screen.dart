@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:task_management/data/service/network_client.dart';
 import 'package:task_management/data/utils/urls.dart';
+import 'package:task_management/ui/screens/main_bottom_nav_screen.dart';
+import 'package:task_management/ui/screens/progress_task_screen.dart';
 import 'package:task_management/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:task_management/ui/widgets/screen_background.dart';
 import 'package:task_management/ui/widgets/tm_app_bar.dart';
@@ -96,6 +98,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
   void _onTapSubmitButton() {
     if (_formKey.currentState!.validate()) {
       _addNewTask();
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MainBottomNavScreen()));
     }
   }
 
